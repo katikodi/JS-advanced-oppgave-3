@@ -1,12 +1,17 @@
 // har lyst å kunne filtrere vekk illegal for standard og/eller commander
 const randomBtn = document.getElementById("get-random-btn");
-const pictureContainer = document.getElementById("random-card-container");
+const cardContainer = document.getElementById("random-card-container");
+const image = document.getElementById('image');
 const infoContainer = document.getElementById("card-attributes-container");
+const imgPlaceholder = "src/blankcardplaceholder.png";
 //-------------------------------------------------------------------------
+// hente annen versjon av bildet uten kanter
 
 let currentCard = {
     imageUrl: "",
     name: "",
+    manaCost: "",
+    colorIdentity: [],
     type: "",
     subtypes: [],
     scryfallUrl: "",
@@ -18,10 +23,23 @@ let currentCard = {
     },
 }
 
+document.addEventListener("DOMContentLoaded", async () => {
+    await buildPage();
+})
+
+randomBtn.addEventListener('click', async () => {
+    await buildPage();
+})
+
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+
 async function getData() {
-    const result = await fetch("https://api.scryfall.com/cards/random", {
+    const encoded = encodeURIComponent("lang:en");
+    const result = await fetch(`https://api.scryfall.com/cards/random?q=${encoded}`, {
         headers:{
-            "User-Agent": "MyApp",
+            "User-Agent": "Æ",
             "Accept":"application/json"
         }
     });
@@ -34,35 +52,55 @@ async function getData() {
     const typesAndSubtypes = data.type_line;
     const onlyTypes = typesAndSubtypes.split('—')[0].trim();
     currentCard.type = onlyTypes;
+    currentCard.scryfallUrl = data.scryfall_uri;
+    currentCard.manaCost = data.mana_cost;
+
+    const formattedManas = currentCard.manaCost.match(/[A-Z]/g);
+    const manas = new Set(formattedManas);
+    currentCard.colorIdentity = Array.from(manas);
 
     console.log("---------");
     console.log(currentCard);
 }
-// await getData();
+// -------------------------------------------------------------------------------------
 
-function buildPage() {
-    pictureContainer.replaceChildren();
+async function buildPage() {
+    image.src = imgPlaceholder;
+    await getData();
+
+    // -------------------------------------------------
     // image half:
-    const image = document.createElement('img');
+/* TO CHANGE:
+fade the default picture
+*/
     image.src = currentCard.imageUrl;
+    image.setAttribute('title', 'Click to view card on the Scryfall website');
 
-    pictureContainer.append(image);
-    console.log(pictureContainer);
+    image.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (e.button === 2) {
+            return;
+        }
+        window.open(currentCard.scryfallUrl);
+    })
 
-    // -------------------------------------------------------------------------
+    cardContainer.append(image);
+    console.log(cardContainer);
+    
+    // -------------------------------------------------
     // info half:
+/* TO ADD:
+<span id="card-title"></span>
+<span id="mana"></span>
+<span id="card-text"></span>
+<span id="misc"></span>
+*/
+
+    infoContainer.replaceChildren();
+    const cardName = document.createElement('h2');
+    cardName.textContent = currentCard.name;
+
+    infoContainer.append(cardName);
 }
+// -------------------------------------------------------------------------------------
 
-randomBtn.addEventListener('click', async () => {
-    await getData();
-    buildPage();
-})
-
-// buildPage();
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-
-    await getData();
-    buildPage();
-})

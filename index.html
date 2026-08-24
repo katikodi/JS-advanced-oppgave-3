@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random MTG Card</title>
+    <link rel="preload" as="image" href="src/blankcardplaceholder.png" fetchpriority="high"> <!-- henter bilde før rendring -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alata&family=League+Spartan:wght@200&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
@@ -11,12 +15,25 @@
     <header>
         <h1>Random MTG Card Picker:</h1>
         <button id="get-random-btn">Get random card</button>
+        <div id="filters">
+            <h3>Show only:</h3>
+            <input type="checkbox" name="legal-standard" id="legal-standard">
+            <label for="legal-standard">Legal in Standard</label>
+            <input type="checkbox" name="legal-commander" id="legal-commander">
+            <label for="legal-commander">Legal in Commander</label>
+            <input type="checkbox" name="legal-commander" id="legal-commander">
+            <label for="legal-commander">Commander</label>
+        </div>
     </header>
     <main>
         <div id="main-container">
-            <div id="random-card-container"></div>
+            <div id="random-card-container">
+                <img id="image" src="src/blankcardplaceholder.png"alt="dynamic card"> 
+            </div>
             <div id="divider"></div>
-            <div id="card-attributes-container">her skal clickable links være</div>
+            <div id="card-attributes-container">
+                
+            </div>
         </div>
     </main>
 </body>
