@@ -1,43 +1,40 @@
-
 :root {
-    --lightest: #f5f6f7;
-    --lightlavender: #c3a3eb;
     --darkpurple: #19161cd5;
-    --subtle: #fafaf9;
+    --bg-color: #fafaf9;
     --main-text-font: "League Spartan";
-    --header-font: "Alata";
-    --h1-size-1: 2em;
+    --header-font: "Barlow";
+    --h1-size-1: 2.2em;
     --h1-size-2: 2.5em;
-    --h2-size-1: 1em;
+    --h2-size-1: 1.5em;
     --h2-size-2: 2em;
-    --manablack: #393335;
-    --manawhite: #FFFDE5;
-    --manared: #FF4141;
-    --manab2w: linear-gradient(to right, var(--manablack), var(--manawhite));
-    --manab2r2w: linear-gradient(to right, var(--manablack), var(--manared), var(--manawhite));
+    --mana-border: linear-gradient(to right, var(--subtle), var(--subtle));
 }
-
 .league-spartan {
     font-family: "League Spartan", sans-serif;
     font-optical-sizing: auto;
     font-weight: 200;
     font-style: normal;
 }
-.alata-regular {
-    font-family: "Alata", sans-serif;
-    font-weight: 400;
+.barlow-semibold {
+    font-family: "Barlow", sans-serif;
+    font-weight: 600;
     font-style: normal;
 }
 
+/* ------- */
+/* GENERAL -------------------------------------------------------- */
+/* ------- */
 
+* {
+    box-sizing: border-box;
+}
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--subtle);
+    background-color: var(--bg-color);
 }
 header {
-    height: 8vh;
-    padding: 2vh 8vw;
+    padding: 2.5vh 8vw;
     background-image: url('src/halfcleankaleidaonblack.png');
     background-repeat: no-repeat;
     background-position: center;
@@ -51,14 +48,22 @@ header {
 button {
     cursor: pointer;
     height: 50%;
+    padding: 8px;
+    border-radius: 50px;
+    font-family: var(--header-font);
+    font-size: 1em;
+    text-wrap: nowrap;
 }
 h1 {
     color: white;
     font-family: var(--header-font);
+    font-size: var(--h1-size-2);
     margin: 0;
+    text-wrap: nowrap;
 }
 h2 {
     font-family: var(--header-font);
+    font-size: var(--h2-size-2);
     margin: 0;
     padding: 5px;
 }
@@ -70,27 +75,40 @@ h3 {
 }
 label {
     font-family: var(--main-text-font);
-    color: white;
+    color: var(--bg-color);
     margin-right: 10px;
 }
+p, a {
+    font-family: "League Spartan";
+    margin: 0;
+    text-decoration: none;
+    color: black;
+}
+span {
+    margin: 10px 0;
+}
+
+/* --------- */
+/* LEFT HALF -------------------------------------------------------- */
+/* --------- */
 
 #main-container {
-    padding: 4vh 2vh;
+    padding: 4vh 4vw;
     display: flex;
     justify-content: center;
     align-items: stretch;
-    gap: 2%;
     width: 100%;
+    gap: 3%;
 }
 
 #random-card-container {
     display: flex;
-    aspect-ratio: 28 / 39;
-    max-height: 70vh;
-    width: auto;
     border-radius: clamp(5px, 17px, 25px);
     overflow: hidden;
     filter: drop-shadow(0 10px 8px hsla(-80 40% 15% / 0.5 ));
+    width: fit-content;
+    height: fit-content;
+    border-radius: 16px;
 }
 
 #image {
@@ -98,7 +116,8 @@ label {
     height: 100%;
     width: 100%;
     cursor: pointer;
-    border-radius: 15px;
+    max-height: 70vh;
+    aspect-ratio: 28 / 39;
 }
 
 #divider {
@@ -108,35 +127,110 @@ label {
     border-radius: 50%;
 }
 
+/* ---------- */
+/* RIGHT HALF -------------------------------------------------------- */
+/* ---------- */
+
 #card-attributes-container {
-    border: 5px solid #16130e71;
     border-radius: 15px;
     max-height: 70vh;
     height: 100%;
-    width: auto;
     min-width: 35%;
-    background: linear-gradient()
-    /*
-    background: linear-gradient(var(--lightlavender)), var(--subtle);
-    */
+    max-width: 50%;
+    flex-grow: 1;
 }
 
-/* ---------- */
-/* title bg colors -------------------------------------------------------- */
-/* ---------- */
+#card-name-div {                        /* title background styling */
+    position: relative;
+    width: fit-content;
+    background: var(--bg-color);
+    border-radius: 10px;
+    margin: 7px 0 15px 10px;
+    padding: 2px 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#card-name-div::after {                 /* mana gradient "border" on title */
+    content: '';
+    position: absolute;
+    border-radius: 11px;
+    background-image: var(--mana-border);
+    z-index: -1;
+    inset: -3px;
+    filter: drop-shadow(0 2px 2px #19161c3d);
+}
+.colorless {
+    border: 3px gray dashed;
+}
 
+.card-attributes-inner-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 15px;
+}
 
+.card-attributes-inner-container > p {  /* mana cost styling */
+    margin: 10px 0;
+}
+
+div#type-div {                          /* typeline styling */
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+div#card-text-container {               /* styling card text area */
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 10px -10px;
+    padding: 10px;
+    border: 2px rgba(0, 0, 0, 0.5) solid;
+    border-radius: 15px;
+    max-width: 35vw;
+}
+div.text-line-div {                     /* individual lines from card text area */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 5px;
+    margin: 3px;
+}
 
 
 /* ---------- */
 /* media queries -------------------------------------------------------- */
 /* ---------- */
-
+/*
 @media screen and (min-width: 1201px) {
     h1 {
         font-size: var(--h1-size-2);
     }
     h2 {
         font-size: var(--h2-size-2);
+    }
+}
+*/
+/*
+@media screen and (max-width: 1310px) {
+    h1 {
+        font-size: var(--h1-size-1);
+    }
+    h2 {
+        font-size: var(--h2-size-1);
+    }
+}
+*/
+@media screen and (max-width: 1040px) {
+    h1 {
+        font-size: var(--h1-size-1);
+    }
+    h2 {
+        font-size: var(--h2-size-1);
+    }
+    header {
+        flex-wrap: wrap;
+        gap: 0 4vw;
     }
 }
