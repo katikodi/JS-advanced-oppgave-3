@@ -9,6 +9,21 @@ const imgMissing = "src/card-image-missing.png";
 // --------------------------------Global objects---------------------------------------
 // -------------------------------------------------------------------------------------
 
+// const writtenMana = {
+//     W: 'White',
+//     U: 'Blue',
+//     B: 'Black',
+//     R: 'Red',
+//     G: 'Green',
+//     X: 'X',
+//     N: 'Any',
+//     C: 'Colorless',
+//     'W/U': 'White or Blue',
+//     'W/B': 'White or Black',
+//     'W/R': 'White or Red',
+//     'W/G': 'White or Green'
+// }
+
 let currentCard = {
     imageUrl: "",
     scryfallUrl: "",
@@ -17,9 +32,6 @@ let currentCard = {
     colorIdentity: [],
     typeLine: "",
     types: [],
-    /*
-    subtypes: [],
-    */
     keywords: [],
     cardText: "",
     legalities: {
@@ -37,15 +49,29 @@ const manaColors = {
     C: 'gray'
 }
 
+const manaPastels = {
+    W: '#FFFFFF',
+    U: '#E3FBFF', //done
+    B: '#E6D9EB', //done
+    R: '#FFE3E3', //done
+    G: '#F3FFEA', //done
+    C: 'gray'
+}
+
+
 const writtenMana = {
-    W: 'White',
-    U: 'Blue',
-    B: 'Black',
-    R: 'Red',
-    G: 'Green',
-    X: 'X',
-    N: 'Any',
-    C: 'Colorless'
+    W: {word: 'White', amount: 0},
+    U: {word: 'Blue', amount: 0},
+    B: {word: 'Black', amount: 0},
+    R: {word: 'Red', amount: 0},
+    G: {word: 'Green', amount: 0},
+    X: {word: 'X', amount: 0},
+    N: {word: 'Any', amount: 0},
+    C: {word: 'Colorless', amount: 0},
+    'W/U': {word: 'White/Blue', amount: 0},
+    'W/B': {word: 'White/Black', amount: 0},
+    'W/R': {word: 'White/Red', amount: 0},
+    'W/G': {word: 'White/Green', amount: 0}
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -53,6 +79,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 })
 
 randomBtn.addEventListener('click', async () => {
+
+    for (const manaObjectKey in writtenMana) {
+        writtenMana[manaObjectKey].amount = 0;
+    }
+
     await buildPage();
 })
 
@@ -67,6 +98,7 @@ TO DO:
     - filterfunksjonalitet for å unngå kort som er illegal i standard og/eller commander
     - ENTEN query layout:normal, ELLER lag custom targeting for transform/saga/adventure
     - lag complicatedMana og kanskje kondenser basicMana eller merge dem om mulig
+    - FIKS manaCostArray is null på land
 TO MAYBE DO:
     - fade 0.5s fra loading placeholder til lasta bilde
     - finn og add symboler til ting ({T} = tapsymbol, manasymbol, osv.)
@@ -79,21 +111,27 @@ TO MAYBE DO:
 // -------------------------------------------------------------------------------------
 
 async function getData() {
-    const encoded = encodeURIComponent("lang:en" + queryInput.value);
+    const encoded = encodeURIComponent("lang:en " + queryInput.value);
     // https://scryfall.com/docs/syntax
     // -----------------
     const result = await fetch(`https://api.scryfall.com/cards/random?q=${encoded}`, {
         headers:{
-            "User-Agent": "Æ",
+            "User-Agent": "Å",
             "Accept":"application/json"
         }
     });
     const data = await result.json();
-    
+
     console.log("------------------------------------------------------");
     console.log(data);
 
-    currentCard.scryfallUrl = data.scryfall_uri;
+    await setData(data);
+}
+
+// -------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------
+
+async function setData(data) {
     (() => {
         if (data.image_uris) {
             if (data.image_uris.png) {
@@ -108,34 +146,27 @@ async function getData() {
             currentCard.imageUrl = imgMissing;
         }
     })();
-
+    currentCard.scryfallUrl = data.scryfall_uri;
     currentCard.name = data.name;
     currentCard.colorIdentity = data.color_identity;
+
+    /*
     currentCard.manaCost = data.mana_cost;
     if (!data.mana_cost) {
         currentCard.manaCost = '';
     }
+    */
+
+    currentCard.manaCost = data.mana_cost ?? '';
+
     currentCard.typeLine = data.type_line;
     currentCard.types = currentCard.typeLine.split(' ');
     currentCard.keywords = data.keywords;
     currentCard.cardText = data.oracle_text;
-    /*
-    const uniqueManaColors = new Set(formatMana());
-    uniqueManaColors.forEach((entry) => {
-        if(entry.match(/\d+|[X]/g) || entry === "X") {
-            uniqueManaColors.delete(entry);
-        }
-    });
-    currentCard.colorIdentity = Array.from(uniqueManaColors);   // alt det her var så unødvendig omg
-    */
+        
     console.log("---------");
     console.log(currentCard);
 }
-
-// -------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------
-
-// async function setData() {   insert mapping-data-to-currentCard-function here   }
 
 // -------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------
@@ -183,13 +214,17 @@ function formatMana() {
     return currentCard.manaCost.match(/\d+|[WUBRGXC]/g);
 }
 // ---------------------------------------------------------
+function getGradient(gradientVersion) {
+    return currentCard.colorIdentity.map(identity => {
+        return gradientVersion[identity];
+    });
+}
+// ---------------------------------------------------------
 function makeTitle() {
     const cardNameDiv = document.createElement('div');
     cardNameDiv.id = 'card-name-div';
     
-    const borderColors = currentCard.colorIdentity.map(identity => {
-        return manaColors[identity];
-    });
+    const borderColors = getGradient(manaColors);
 
     cardNameDiv.style.setProperty(
         "--mana-border",
@@ -206,11 +241,12 @@ function makeTitle() {
 }
 // ---------------------------------------------------------
 function makeManaInfo() {
-    if (currentCard.manaCost.includes("/")) {
-        return complicatedMana();
-    } else {
-        return basicMana();
-    }
+    // if (currentCard.manaCost.includes("/")) {
+    //     return complicatedMana();
+    // } else {
+    //     return basicMana();
+    // }
+    return complicatedMana();
 }
 // ---------------------------------------------------------
 function basicMana() {
@@ -257,8 +293,42 @@ function basicMana() {
 }
 // ---------------------------------------------------------
 function complicatedMana() {
-    const manaCostArray = currentCard.manaInfo.match(/(?<={)[^}](?=})/g);
-    console.log(manaCostArray);
+    const manaCostArray = currentCard.manaCost.match(/(?<={)[^}]+(?=})/g);
+    
+    let manaText = [];
+
+    manaCostArray.forEach((manaKey) => {
+
+        if (!writtenMana[manaKey]) {
+            manaText.push(`${manaKey} Any`);
+            return;
+        }
+
+
+        writtenMana[manaKey].amount++;
+        manaText.push(`${writtenMana[manaKey].amount} ${writtenMana[manaKey].word}`);
+        console.log(manaText);
+
+        if (writtenMana[manaKey].amount >= 1) {
+            manaText.pop();
+            manaText.push(`${writtenMana[manaKey].amount} ${writtenMana[manaKey].word}`);
+            console.log(manaText);
+            return;
+        }
+
+        console.log(writtenMana[manaKey].amount);
+
+    });
+
+
+    console.log(manaText);
+
+
+    const manaInfo = document.createElement('p');
+    manaInfo.textContent = `Cost: ${manaText.join(' + ')}`;
+
+    return manaInfo;
+
 }
 // ---------------------------------------------------------
 function makeCardTypeInfo() {
@@ -348,6 +418,12 @@ function makeCardText() {
             }
         })
         cardTextContainer.append(textLineDiv);
+
+        const backgroundColors = getGradient(manaPastels);
+        cardTextContainer.style.setProperty(
+            "--mana-border",
+            `linear-gradient(to right, ${backgroundColors.join(", ")})`
+        );
     })
     return cardTextContainer;
 }

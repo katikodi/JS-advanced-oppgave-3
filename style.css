@@ -1,5 +1,5 @@
 :root {
-    --darkpurple: #19161cd5;
+    --darkpurple: #19161ce8;
     --bg-color: #fafaf9;
     --main-text-font: "League Spartan";
     --header-font: "Barlow";
@@ -84,6 +84,9 @@ p, a {
     text-decoration: none;
     color: black;
 }
+a {
+    color: darkblue;
+}
 span {
     margin: 10px 0;
 }
@@ -144,9 +147,9 @@ span {
     position: relative;
     width: fit-content;
     background: var(--bg-color);
-    border-radius: 10px;
+    border-radius: 8px;
     margin: 7px 0 15px 10px;
-    padding: 2px 5px;
+    padding: 1px 3px; /* var 3 5 */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -157,7 +160,7 @@ span {
     border-radius: 11px;
     background-image: var(--mana-border);
     z-index: -1;
-    inset: -3px;
+    inset: -4px; /* var -3 */
     filter: drop-shadow(0 2px 2px #19161c3d);
 }
 .colorless {
@@ -189,6 +192,8 @@ div#card-text-container {               /* styling card text area */
     border: 2px rgba(0, 0, 0, 0.5) solid;
     border-radius: 15px;
     max-width: 35vw;
+    background-image: var(--mana-border);
+    background-color: #fafaf908;
 }
 div.text-line-div {                     /* individual lines from card text area */
     display: flex;
