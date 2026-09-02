@@ -58,7 +58,6 @@ const manaPastels = {
     C: 'gray'
 }
 
-
 const writtenMana = {
     W: {word: 'White', amount: 0},
     U: {word: 'Blue', amount: 0},
@@ -70,8 +69,14 @@ const writtenMana = {
     C: {word: 'Colorless', amount: 0},
     'W/U': {word: 'White/Blue', amount: 0},
     'W/B': {word: 'White/Black', amount: 0},
-    'W/R': {word: 'White/Red', amount: 0},
-    'W/G': {word: 'White/Green', amount: 0}
+    'B/R': {word: 'Black/Red', amount: 0},
+    'B/G': {word: 'Black/Green', amount: 0},
+    'U/B': {word: 'Blue/Black', amount: 0},
+    'U/R': {word: 'Blue/Red', amount: 0},
+    'R/G': {word: 'Red/Green', amount: 0},
+    'R/W': {word: 'Red/White', amount: 0},
+    'G/W': {word: 'Green/White', amount: 0},
+    'G/B': {word: 'Green/Blue', amount: 0},
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -214,6 +219,20 @@ function formatMana() {
     return currentCard.manaCost.match(/\d+|[WUBRGXC]/g);
 }
 // ---------------------------------------------------------
+function formatCardText(text) {
+    if (text.includes('{')) {
+        const bracketlessText = text.pop().shift();
+        if (bracketlessText === 'T') {
+            return 'Tap';
+        } else if (/*number*/) {
+            return /* number Any */
+        }
+    
+        //map til writtenMana arrayet og lag ny const som bruker words fra det
+        //return den nye consten
+    }
+}
+// ---------------------------------------------------------
 function getGradient(gradientVersion) {
     return currentCard.colorIdentity.map(identity => {
         return gradientVersion[identity];
@@ -304,20 +323,15 @@ function complicatedMana() {
             return;
         }
 
-
         writtenMana[manaKey].amount++;
-        manaText.push(`${writtenMana[manaKey].amount} ${writtenMana[manaKey].word}`);
-        console.log(manaText);
 
-        if (writtenMana[manaKey].amount >= 1) {
+        if (writtenMana[manaKey].amount > 1) {
             manaText.pop();
-            manaText.push(`${writtenMana[manaKey].amount} ${writtenMana[manaKey].word}`);
-            console.log(manaText);
-            return;
         }
 
-        console.log(writtenMana[manaKey].amount);
+        manaText.push(`${writtenMana[manaKey].amount} ${writtenMana[manaKey].word}`);
 
+        console.log(writtenMana[manaKey].amount);
     });
 
 
@@ -407,13 +421,13 @@ function makeCardText() {
 
             if (currentCard.keywords.includes(cardWord)) {
                 const keywordLink = document.createElement('a');
-                keywordLink.textContent = cardWord;
+                keywordLink.textContent = formatCardText(cardWord);
                 keywordLink.href = `https://scryfall.com/search?q=kw%3A%22${cardWord}%22`;
                 keywordLink.target = '_blank';
                 textLineDiv.append(keywordLink);
             } else {
                 const normalWord = document.createElement('p');
-                normalWord.textContent = cardWord;
+                normalWord.textContent = formatCardText(cardWord);
                 textLineDiv.append(normalWord);
             }
         })
